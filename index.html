@@ -30,6 +30,34 @@
         
         #map { height: 100%; width: 100%; z-index: 1; }
 
+        /* AVISO PERSONALIZADO (Substitui o Alert do Navegador) */
+        #custom-alert {
+            display: none;
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 5000;
+            box-shadow: var(--shadow-soft);
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -20px); }
+            15% { opacity: 1; transform: translate(-50%, 0); }
+            85% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
         .header-floating {
             position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
             width: auto; max-width: 90%;
@@ -75,20 +103,14 @@
             transition: transform 0.2s;
         }
 
-        .leaflet-popup-content-wrapper {
-            border-radius: 16px; padding: 0; overflow: hidden;
-            box-shadow: var(--shadow-soft);
-        }
+        .leaflet-popup-content-wrapper { border-radius: 16px; padding: 0; overflow: hidden; box-shadow: var(--shadow-soft); }
         .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
 
         .card-popup { display: flex; flex-direction: column; }
         .card-header { position: relative; height: 150px; width: 100%; background-color: #eee; overflow: hidden; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
-
         .card-body { padding: 16px; text-align: center; }
         .card-title { margin: 0 0 4px 0; font-size: 17px; color: #222; font-weight: 700; }
-        
-        /* ESTILO DA REFERÊNCIA */
         .card-ref { margin: 0 0 14px 0; font-size: 13px; color: #666; font-weight: 400; }
 
         .btn-rota {
@@ -121,6 +143,8 @@
 </head>
 <body>
 
+    <div id="custom-alert"></div>
+
     <div class="header-floating"><h1>🚒 Hidrantes - Reg. Leste</h1></div>
 
     <div class="controles-flutuantes">
@@ -140,9 +164,22 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
+        // Função para aviso sem domínio
+        function mostrarAviso(msg) {
+            const alerta = document.getElementById('custom-alert');
+            alerta.innerText = msg;
+            alerta.style.display = 'block';
+            alerta.style.animation = 'none';
+            alerta.offsetHeight; 
+            alerta.style.animation = 'fadeInOut 3s forwards';
+            setTimeout(() => { alerta.style.display = 'none'; }, 3000);
+        }
+
         var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-26.24, -48.82], 14);
+        
+        // Usando CartoDB para evitar bloqueios de política de uso
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            attribution: '&copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 20
         }).addTo(map);
@@ -165,7 +202,6 @@
             popupAnchor: [0, -25]
         });
 
-        // DADOS COM REFERÊNCIA ADICIONADA
         var locais = [
             { nome: "Unidade 10 - Westrupp", ref: "📍 Unidade 10", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", imagem: "unidade_foto.png" },
             { nome: "R. Jacupiranga, 873", ref: "📍 Em frente à uma agropecuária", lat: -26.239652, lng: -48.808429, tipo: "hidrante", imagem: "hidrante1.png" },
@@ -182,7 +218,7 @@
             var popupContent = `
                 <div class="card-popup">
                     <div class="card-header" onclick="abrirModal('${local.imagem}', ${local.lat}, ${local.lng})">
-                        <img src="${local.imagem}" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1580974511757-3451711a9a6f?q=80&w=500&auto=format&fit=crop';">
+                        <img src="${local.imagem}" class="card-img" onerror="this.src='https://via.placeholder.com/260x150?text=Sem+Foto'">
                     </div>
                     <div class="card-body">
                         <h3 class="card-title">${local.nome}</h3>
@@ -204,6 +240,7 @@
         function fecharModal() { document.getElementById('modalImagem').style.display = 'none'; }
 
         function minhaLocalizacao() {
+            if (!navigator.geolocation) return mostrarAviso("⚠️ GPS não suportado");
             btnGps.innerHTML = '⌛';
             navigator.geolocation.getCurrentPosition(function(pos) {
                 userLat = pos.coords.latitude; userLng = pos.coords.longitude;
@@ -211,11 +248,18 @@
                 userMarker = L.circleMarker([userLat, userLng], { radius: 10, fillColor: "#2196F3", color: "white", weight: 3, fillOpacity: 0.9 }).addTo(map);
                 map.flyTo([userLat, userLng], 16);
                 btnGps.innerHTML = '📍';
-            }, function() { btnGps.innerHTML = '📍'; }, { enableHighAccuracy: true });
+            }, function() { 
+                btnGps.innerHTML = '📍';
+                mostrarAviso("❌ Erro ao obter sinal do GPS");
+            }, { enableHighAccuracy: true });
         }
 
         function tracarRota(destLat, destLng) {
-            if (!userLat) { alert("Ative o GPS primeiro."); minhaLocalizacao(); return; }
+            if (!userLat) { 
+                mostrarAviso("📍 Localize-se primeiro no botão azul"); 
+                minhaLocalizacao(); 
+                return; 
+            }
             if (controleRota) map.removeControl(controleRota);
             controleRota = L.Routing.control({
                 waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
@@ -228,7 +272,12 @@
         }
 
         function cancelarRota() {
-            if (controleRota) { map.removeControl(controleRota); controleRota = null; btnCancelar.style.display = 'none'; }
+            if (controleRota) { 
+                map.removeControl(controleRota); 
+                controleRota = null; 
+                btnCancelar.style.display = 'none'; 
+                mostrarAviso("Rota cancelada");
+            }
         }
     </script>
 </body>
