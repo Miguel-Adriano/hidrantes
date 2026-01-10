@@ -19,14 +19,19 @@
             --shadow-hard: 0 4px 10px rgba(0,0,0,0.25);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: pan-x pan-y;
+        }
 
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             overflow: hidden; 
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
-            overscroll-behavior-y: contain;
+            overscroll-behavior-y: none; 
+            position: fixed;
         }
         
         #map { height: 100%; width: 100%; z-index: 1; }
@@ -48,6 +53,7 @@
             text-align: center;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.2);
+            pointer-events: none;
         }
 
         @keyframes fadeInOut {
@@ -99,10 +105,9 @@
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .card-body { padding: 15px; text-align: center; }
         .card-title { margin: 0 0 4px 0; font-size: 16px; color: #222; font-weight: 700; }
-        .card-ref { margin: 0 0 8px 0; font-size: 13px; color: #666; }
+        .card-ref { margin: 0 0 8px 0; font-size: 13px; color: #666; line-height: 1.4; }
         .card-eta { color: var(--primary-blue); font-weight: 700; font-size: 13px; display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; margin-bottom: 12px; }
 
-        /* Estilo dos Botões de Rota */
         .area-botoes { display: flex; flex-direction: column; gap: 8px; }
         
         .btn-rota {
@@ -140,7 +145,7 @@
     </div>
 
     <div id="modalImagem">
-        <span class="btn-close-modal" onclick="fecharModal()">&times;</span>
+        <span class="btn-close-modal" onclick="fecharModal()">×</span>
         <img id="imgExpandida" src="">
     </div>
 
@@ -163,9 +168,9 @@
         var locais = [
             { nome: "Unidade 10 - Westrupp", ref: "📍 Unidade 10", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", imagem: "unidade_foto.png" },
             { nome: "R. Jacupiranga, 873", ref: "📍 Agropecuária Jacupiranga", lat: -26.239652, lng: -48.808429, tipo: "hidrante", imagem: "hidrante1.png" },
-            { nome: "Estr. Timbé, 6193", ref: "📍 Posto Policial", lat: -26.218075, lng: -48.818592, tipo: "hidrante", imagem: "hidrante2.png" },
-            { nome: "Av. Santos Dumont, 3505", ref: "📍 Próximo ao Libidus", lat: -26.245698, lng: -48.840077, tipo: "hidrante", imagem: "hidrante3.png" },
-            { nome: "R. Tuiuti, 2411", ref: "📍 Cooper", lat: -26.251597, lng: -48.819645, tipo: "hidrante", imagem: "hidrante4.png" },
+            { nome: "Estr. Timbé, 6193", ref: "📍 Em frente ao posto policial", lat: -26.218075, lng: -48.818592, tipo: "hidrante", imagem: "hidrante2.png" },
+            { nome: "Av. Santos Dumont, 3505", ref: "📍 Próximo ao motel Libidus", lat: -26.245698, lng: -48.840077, tipo: "hidrante", imagem: "hidrante3.png" },
+            { nome: "R. Tuiuti, 2411", ref: "📍 Supermercado Cooper", lat: -26.251597, lng: -48.819645, tipo: "hidrante", imagem: "hidrante4.png" },
             { nome: "R. Guaíra, 1404", ref: "📍 Em frente ao posto", lat: -26.261370, lng: -48.817416, tipo: "hidrante", imagem: "hidrante5.png" }
         ];
 
@@ -221,7 +226,6 @@
                     userMarker = L.circleMarker([userLat, userLng], { radius: 10, fillColor: "#1a73e8", color: "white", weight: 3, fillOpacity: 0.9 }).addTo(map);
                     map.flyTo([userLat, userLng], 16);
                     btnGps.innerHTML = '📍';
-                    mostrarAviso("📍 GPS OK");
                 }, 
                 function() { btnGps.innerHTML = '📍'; mostrarAviso("❌ Erro GPS"); }, 
                 { enableHighAccuracy: true }
@@ -250,7 +254,6 @@
         }
 
         function abrirGoogleMaps(destLat, destLng) {
-            // Se tiver a localização do usuário, manda a rota completa. Se não, manda só o destino.
             let url = userLat 
                 ? `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destLat},${destLng}&travelmode=driving`
                 : `https://www.google.com/maps/search/?api=1&query=${destLat},${destLng}`;
@@ -258,7 +261,7 @@
         }
 
         function cancelarRota() {
-            if (controleRota) { map.removeControl(controleRota); controleRota = null; btnCancelar.style.display = 'none'; mostrarAviso("Rota cancelada"); }
+            if (controleRota) { map.removeControl(controleRota); controleRota = null; btnCancelar.style.display = 'none'; }
         }
 
         function mostrarAviso(msg) {
@@ -270,6 +273,11 @@
 
         function abrirModal(src) { document.getElementById('imgExpandida').src = src; document.getElementById('modalImagem').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalImagem').style.display = 'none'; }
+
+        // ATIVAÇÃO AUTOMÁTICA AO CARREGAR
+        window.onload = function() {
+            minhaLocalizacao();
+        };
     </script>
 </body>
 </html>
