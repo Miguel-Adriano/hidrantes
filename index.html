@@ -141,7 +141,11 @@
 
     <script>
         var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-26.24, -48.82], 14);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
 
         var userLat, userLng, controleRota, userMarker;
         var btnCancelar = document.getElementById('btnCancelar');
