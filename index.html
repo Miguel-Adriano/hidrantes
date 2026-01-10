@@ -139,10 +139,19 @@
         }
 
         function abrirGoogleMaps(lat, lng) {
-            // Formato que força o app do Maps a abrir
-            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-            window.open(url, '_blank');
-        }
+    // Tenta abrir diretamente o aplicativo (Esquema de intenção Android)
+    const urlApp = `google.navigation:q=${lat},${lng}`;
+    // Link reserva caso o de cima falhe (Link Universal)
+    const urlWeb = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    
+    // Tenta disparar o protocolo do app
+    window.location.href = urlApp;
+    
+    // Caso o celular não reconheça o protocolo em 500ms, ele abre o link web que força o app
+    setTimeout(function() {
+        window.open(urlWeb, '_blank');
+    }, 500);
+}
 
         function tracarRota(lat, lng) {
             if (!userLat) { alert("Ative o GPS primeiro"); minhaLocalizacao(); return; }
