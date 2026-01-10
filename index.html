@@ -22,19 +22,21 @@
         * { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
-            touch-action: pan-x pan-y;
         }
 
+        /* TRAVA TOTAL CONTRA PULL-TO-REFRESH */
         body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
+            margin: 0; padding: 0; 
+            height: 100%; width: 100%; 
             overflow: hidden; 
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
             overscroll-behavior-y: none; 
-            position: fixed;
+            overscroll-behavior: none;
+            position: fixed; /* Fixa a base para impedir o arrasto do navegador */
         }
         
-        #map { height: 100%; width: 100%; z-index: 1; }
+        #map { height: 100%; width: 100%; z-index: 1; touch-action: none; }
 
         #custom-alert {
             display: none;
@@ -114,13 +116,13 @@
             width: 100%; padding: 12px;
             border: none; border-radius: 10px;
             font-weight: 700; font-size: 14px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             cursor: pointer;
         }
         
         .btn-interno { background: var(--success-green); color: white; }
         .btn-google { background: #fff; color: #444; border: 1px solid #ddd; }
-        .btn-google img { width: 18px; }
+        .btn-google img { width: 20px; height: 20px; }
 
         #modalImagem {
             display: none; position: fixed; z-index: 6000;
@@ -155,6 +157,22 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
+        // --- SCRIPT PARA BLOQUEAR ARRASTO DE ATUALIZAÇÃO ---
+        window.addEventListener('load', function() {
+            let lastTouchY = 0;
+            document.addEventListener('touchstart', function(e) {
+                lastTouchY = e.touches[0].clientY;
+            }, { passive: false });
+
+            document.addEventListener('touchmove', function(e) {
+                let touchY = e.touches[0].clientY;
+                // Se estiver no topo da página e tentar puxar para baixo, bloqueia
+                if (window.pageYOffset === 0 && touchY > lastTouchY) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+
         var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-26.24, -48.82], 14);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
@@ -167,10 +185,10 @@
 
         var locais = [
             { nome: "Unidade 10 - Westrupp", ref: "📍 Unidade 10", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", imagem: "unidade_foto.png" },
-            { nome: "R. Jacupiranga, 873", ref: "📍 Agropecuária Jacupiranga", lat: -26.239652, lng: -48.808429, tipo: "hidrante", imagem: "hidrante1.png" },
+            { nome: "R. Jacupiranga, 873", ref: "📍 Em frente a Agropecuária Jacupiranga", lat: -26.239652, lng: -48.808429, tipo: "hidrante", imagem: "hidrante1.png" },
             { nome: "Estr. Timbé, 6193", ref: "📍 Em frente ao posto policial", lat: -26.218075, lng: -48.818592, tipo: "hidrante", imagem: "hidrante2.png" },
             { nome: "Av. Santos Dumont, 3505", ref: "📍 Próximo ao motel Libidus", lat: -26.245698, lng: -48.840077, tipo: "hidrante", imagem: "hidrante3.png" },
-            { nome: "R. Tuiuti, 2411", ref: "📍 Supermercado Cooper", lat: -26.251597, lng: -48.819645, tipo: "hidrante", imagem: "hidrante4.png" },
+            { nome: "R. Tuiuti, 2411", ref: "📍 Em frente ao Supermercado Cooper", lat: -26.251597, lng: -48.819645, tipo: "hidrante", imagem: "hidrante4.png" },
             { nome: "R. Guaíra, 1404", ref: "📍 Em frente ao posto", lat: -26.261370, lng: -48.817416, tipo: "hidrante", imagem: "hidrante5.png" }
         ];
 
@@ -206,7 +224,7 @@
                             <div class="area-botoes">
                                 <button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})">🚀 ROTA INTERNA</button>
                                 <button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991147.png"> GOOGLE MAPS
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Google_Maps_icon_%282015-2020%29.svg"> GOOGLE MAPS
                                 </button>
                             </div>
                         </div>
@@ -274,7 +292,6 @@
         function abrirModal(src) { document.getElementById('imgExpandida').src = src; document.getElementById('modalImagem').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalImagem').style.display = 'none'; }
 
-        // ATIVAÇÃO AUTOMÁTICA AO CARREGAR
         window.onload = function() {
             minhaLocalizacao();
         };
