@@ -1,91 +1,237 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>GPS Bombeiros - Regional Leste</title>
-    
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --primary-red: #D32F2F;
             --primary-blue: #1a73e8;
             --success-green: #2E7D32;
             --bg-glass: rgba(255, 255, 255, 0.95);
-            --shadow-soft: 0 8px 30px rgba(0,0,0,0.12);
-            --shadow-hard: 0 4px 10px rgba(0,0,0,0.25);
+            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-hard: 0 4px 10px rgba(0, 0, 0, 0.25);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; overscroll-behavior: none;
-            position: fixed; left: 0; top: 0;
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
-        #map { height: 100%; width: 100%; z-index: 1; }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            overscroll-behavior: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
 
         .header-floating {
-            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-            background: var(--bg-glass); padding: 10px 24px; border-radius: 50px;
-            z-index: 1000; box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5);
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-glass);
+            padding: 10px 24px;
+            border-radius: 50px;
+            z-index: 1000;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
-        .header-floating h1 { margin: 0; font-size: 15px; color: #333; font-weight: 700; }
+
+        .header-floating h1 {
+            margin: 0;
+            font-size: 15px;
+            color: #333;
+            font-weight: 700;
+        }
 
         .controles-flutuantes {
-            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            display: flex; flex-direction: column; gap: 15px; pointer-events: none;
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: none;
         }
+
         .btn-fab {
-            pointer-events: auto; width: 56px; height: 56px;
-            border-radius: 50%; border: none; font-size: 24px;
-            box-shadow: var(--shadow-hard); display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
+            pointer-events: auto;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            box-shadow: var(--shadow-hard);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
-        .btn-fab.gps { background: var(--primary-blue); color: white; }
-        .btn-fab.cancelar { background: var(--primary-red); color: white; display: none; }
+
+        .btn-fab.gps {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-fab.cancelar {
+            background: var(--primary-red);
+            color: white;
+            display: none;
+        }
 
         /* Estilo do Popup */
-        .leaflet-popup-content-wrapper { border-radius: 16px; padding: 0; overflow: hidden; }
-        .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
-        .card-popup { display: flex; flex-direction: column; }
-        .card-header { height: 140px; background-color: #eee; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .card-body { padding: 15px; text-align: center; }
-        .card-title { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
-        .card-ref { font-size: 13px; color: #666; margin-bottom: 10px; }
-        .card-eta { color: var(--primary-blue); font-weight: 700; display: block; margin-bottom: 10px; }
-        
-        .area-botoes { display: flex; flex-direction: column; gap: 8px; }
-        .btn-rota {
-            width: 100%; padding: 12px; border: none; border-radius: 10px;
-            font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+        .leaflet-popup-content-wrapper {
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
         }
-        .btn-interno { background: var(--success-green); color: white; }
-        .btn-google { background: #fff; color: #444; border: 1px solid #ddd; }
-        .btn-google img { width: 18px; height: 18px; }
+
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: 260px !important;
+        }
+
+        .card-popup {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            height: 140px;
+            background-color: #eee;
+            overflow: hidden;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .card-body {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .card-title {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .card-ref {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .card-eta {
+            color: var(--primary-blue);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .area-botoes {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-rota {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-interno {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-google {
+            background: #fff;
+            color: #444;
+            border: 1px solid #ddd;
+        }
+
+        .btn-google img {
+            width: 18px;
+            height: 18px;
+        }
 
         /* Modal de Imagem Expandida */
         #modalImagem {
-            display: none; position: fixed; z-index: 9999;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
         }
-        #imgExpandida { max-width: 95%; max-height: 80%; border-radius: 8px; }
-        .btn-close-modal { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; }
 
-        .leaflet-routing-container { display: none !important; }
+        #imgExpandida {
+            max-width: 95%;
+            max-height: 80%;
+            border-radius: 8px;
+        }
+
+        .btn-close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 40px;
+        }
+
+        .leaflet-routing-container {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body>
 
-    <div class="header-floating"><h1>🚒 Hidrantes - Reg. Leste</h1></div>
+    <div class="header-floating">
+        <h1>🚒 Hidrantes - Reg. Leste</h1>
+    </div>
 
     <div class="controles-flutuantes">
         <button id="btnCancelar" class="btn-fab cancelar" onclick="cancelarRota()">✖</button>
@@ -105,10 +251,10 @@
     <script>
         // --- BLOQUEIO DE RECARREGAMENTO APK ---
         let ts;
-        document.addEventListener('touchstart', (e) => { ts = e.touches[0].clientY; }, {passive: false});
+        document.addEventListener('touchstart', (e) => { ts = e.touches[0].clientY; }, { passive: false });
         document.addEventListener('touchmove', (e) => {
             if (window.scrollY === 0 && e.touches[0].clientY > ts) e.preventDefault();
-        }, {passive: false});
+        }, { passive: false });
 
         // --- CONFIG MAPA ---
         var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-26.24, -48.82], 14);
@@ -139,32 +285,26 @@
         }
 
         function abrirGoogleMaps(lat, lng) {
-    // Tenta abrir diretamente o aplicativo (Esquema de intenção Android)
-    const urlApp = `google.navigation:q=${lat},${lng}`;
-    // Link reserva caso o de cima falhe (Link Universal)
-    const urlWeb = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-    
-    // Tenta disparar o protocolo do app
-    window.location.href = urlApp;
-    
-    // Caso o celular não reconheça o protocolo em 500ms, ele abre o link web que força o app
-    setTimeout(function() {
-        window.open(urlWeb, '_blank');
-    }, 500);
-}
+            // Este formato é o link universal que o Android intercepta e pergunta: 
+            // "Abrir com o Maps?" ou abre direto o app.
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
 
+            // No APK, o window.open às vezes falha. Usar o location.href é mais seguro.
+            window.location.href = url;
+        }
+ 
         function tracarRota(lat, lng) {
             if (!userLat) { alert("Ative o GPS primeiro"); minhaLocalizacao(); return; }
             if (controleRota) map.removeControl(controleRota);
-            
+
             controleRota = L.Routing.control({
                 waypoints: [L.latLng(userLat, userLng), L.latLng(lat, lng)],
-                lineOptions: { styles: [{color: '#1a73e8', weight: 6}] },
+                lineOptions: { styles: [{ color: '#1a73e8', weight: 6 }] },
                 createMarker: () => null,
                 addWaypoints: false,
                 show: false
             }).addTo(map);
-            
+
             document.getElementById('btnCancelar').style.display = 'flex';
             map.closePopup();
         }
@@ -180,18 +320,18 @@
                 if (userMarker) map.removeLayer(userMarker);
                 userMarker = L.circleMarker([userLat, userLng], { radius: 8, color: 'white', fillColor: '#1a73e8', fillOpacity: 1, weight: 3 }).addTo(map);
                 map.flyTo([userLat, userLng], 15);
-            }, null, {enableHighAccuracy: true});
+            }, null, { enableHighAccuracy: true });
         }
 
         // --- RENDERIZAR MARCADORES ---
         locais.forEach(local => {
-            const marker = L.marker([local.lat, local.lng], { 
-                icon: local.tipo === "unidade" ? iconeUnidade : iconeHidrante 
+            const marker = L.marker([local.lat, local.lng], {
+                icon: local.tipo === "unidade" ? iconeUnidade : iconeHidrante
             }).addTo(map);
 
             marker.bindPopup(() => {
                 let eta = "Ative o GPS";
-                if(userLat) {
+                if (userLat) {
                     const d = map.distance([userLat, userLng], [local.lat, local.lng]) / 1000;
                     eta = `${Math.round(d * 2)} min (${d.toFixed(1)} km)`;
                 }
@@ -219,4 +359,5 @@
         window.onload = minhaLocalizacao;
     </script>
 </body>
+
 </html>
