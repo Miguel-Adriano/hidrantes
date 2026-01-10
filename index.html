@@ -241,17 +241,45 @@
 
         function minhaLocalizacao() {
             if (!navigator.geolocation) return mostrarAviso("⚠️ GPS não suportado");
+            
             btnGps.innerHTML = '⌛';
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                userLat = pos.coords.latitude; userLng = pos.coords.longitude;
-                if (userMarker) map.removeLayer(userMarker);
-                userMarker = L.circleMarker([userLat, userLng], { radius: 10, fillColor: "#2196F3", color: "white", weight: 3, fillOpacity: 0.9 }).addTo(map);
-                map.flyTo([userLat, userLng], 16);
-                btnGps.innerHTML = '📍';
-            }, function() { 
-                btnGps.innerHTML = '📍';
-                mostrarAviso("❌ Erro ao obter sinal do GPS");
-            }, { enableHighAccuracy: true });
+
+            // Configurações para forçar o GPS a responder
+            const options = {
+                enableHighAccuracy: true, 
+                timeout: 8000, // Se em 8 segundos não achar, dá erro
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    userLat = pos.coords.latitude; 
+                    userLng = pos.coords.longitude;
+                    
+                    if (userMarker) map.removeLayer(userMarker);
+                    
+                    userMarker = L.circleMarker([userLat, userLng], { 
+                        radius: 10, 
+                        fillColor: "#2196F3", 
+                        color: "white", 
+                        weight: 3, 
+                        fillOpacity: 0.9 
+                    }).addTo(map);
+                    
+                    map.flyTo([userLat, userLng], 16);
+                    btnGps.innerHTML = '📍';
+                    mostrarAviso("📍 Localização atualizada");
+                }, 
+                function(error) { 
+                    btnGps.innerHTML = '📍';
+                    // Diagnóstico do erro
+                    if(error.code == 1) mostrarAviso("❌ Permissão de GPS negada");
+                    else if(error.code == 2) mostrarAviso("❌ Sinal de GPS indisponível");
+                    else if(error.code == 3) mostrarAviso("❌ Tempo esgotado (GPS lento)");
+                    else mostrarAviso("❌ Erro desconhecido no GPS");
+                }, 
+                options
+            );
         }
 
         function tracarRota(destLat, destLng) {
