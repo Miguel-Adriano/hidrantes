@@ -19,126 +19,72 @@
             --shadow-hard: 0 4px 10px rgba(0,0,0,0.25);
         }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* TRAVA TOTAL CONTRA PULL-TO-REFRESH */
         body, html { 
-            margin: 0; padding: 0; 
-            height: 100%; width: 100%; 
-            overflow: hidden; 
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            overscroll-behavior-y: none; 
-            overscroll-behavior: none;
-            position: fixed; /* Fixa a base para impedir o arrasto do navegador */
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            overflow: hidden; font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; overscroll-behavior: none;
+            position: fixed; left: 0; top: 0;
         }
         
-        #map { height: 100%; width: 100%; z-index: 1; touch-action: none; }
-
-        #custom-alert {
-            display: none;
-            position: fixed;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            z-index: 5000;
-            box-shadow: var(--shadow-soft);
-            font-size: 14px;
-            font-weight: 600;
-            text-align: center;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            pointer-events: none;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, -20px); }
-            15% { opacity: 1; transform: translate(-50%, 0); }
-            85% { opacity: 1; transform: translate(-50%, 0); }
-            100% { opacity: 0; transform: translate(-50%, -20px); }
-        }
+        #map { height: 100%; width: 100%; z-index: 1; }
 
         .header-floating {
             position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-            width: auto; max-width: 90%;
-            background: var(--bg-glass);
-            padding: 10px 24px;
-            border-radius: 50px;
-            z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5);
+            background: var(--bg-glass); padding: 10px 24px; border-radius: 50px;
+            z-index: 1000; box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5);
         }
-
-        .header-floating h1 { margin: 0; font-size: 15px; color: #333; font-weight: 700; white-space: nowrap; }
+        .header-floating h1 { margin: 0; font-size: 15px; color: #333; font-weight: 700; }
 
         .controles-flutuantes {
             position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            display: flex; flex-direction: column; gap: 15px;
-            pointer-events: none;
+            display: flex; flex-direction: column; gap: 15px; pointer-events: none;
         }
-
         .btn-fab {
-            pointer-events: auto;
-            width: 56px; height: 56px;
-            border-radius: 50%; border: none;
-            font-size: 24px;
-            box-shadow: var(--shadow-hard);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s;
+            pointer-events: auto; width: 56px; height: 56px;
+            border-radius: 50%; border: none; font-size: 24px;
+            box-shadow: var(--shadow-hard); display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
         }
-
         .btn-fab.gps { background: var(--primary-blue); color: white; }
         .btn-fab.cancelar { background: var(--primary-red); color: white; display: none; }
 
+        /* Estilo do Popup */
         .leaflet-popup-content-wrapper { border-radius: 16px; padding: 0; overflow: hidden; }
         .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
-
         .card-popup { display: flex; flex-direction: column; }
-        .card-header { height: 140px; background-color: #eee; overflow: hidden; cursor: pointer; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .card-header { height: 140px; background-color: #eee; overflow: hidden; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
         .card-body { padding: 15px; text-align: center; }
-        .card-title { margin: 0 0 4px 0; font-size: 16px; color: #222; font-weight: 700; }
-        .card-ref { margin: 0 0 8px 0; font-size: 13px; color: #666; line-height: 1.4; }
-        .card-eta { color: var(--primary-blue); font-weight: 700; font-size: 13px; display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; margin-bottom: 12px; }
-
+        .card-title { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
+        .card-ref { font-size: 13px; color: #666; margin-bottom: 10px; }
+        .card-eta { color: var(--primary-blue); font-weight: 700; display: block; margin-bottom: 10px; }
+        
         .area-botoes { display: flex; flex-direction: column; gap: 8px; }
-        
         .btn-rota {
-            width: 100%; padding: 12px;
-            border: none; border-radius: 10px;
-            font-weight: 700; font-size: 14px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            cursor: pointer;
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        
         .btn-interno { background: var(--success-green); color: white; }
         .btn-google { background: #fff; color: #444; border: 1px solid #ddd; }
-        .btn-google img { width: 20px; height: 20px; }
+        .btn-google img { width: 18px; height: 18px; }
 
+        /* Modal de Imagem Expandida */
         #modalImagem {
-            display: none; position: fixed; z-index: 6000;
+            display: none; position: fixed; z-index: 9999;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
         }
-        .btn-close-modal { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; }
-        #imgExpandida { max-width: 90%; max-height: 80vh; border-radius: 8px; }
-        
+        #imgExpandida { max-width: 95%; max-height: 80%; border-radius: 8px; }
+        .btn-close-modal { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; }
+
         .leaflet-routing-container { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="custom-alert"></div>
     <div class="header-floating"><h1>🚒 Hidrantes - Reg. Leste</h1></div>
 
     <div class="controles-flutuantes">
@@ -146,8 +92,8 @@
         <button class="btn-fab gps" onclick="minhaLocalizacao()">📍</button>
     </div>
 
-    <div id="modalImagem">
-        <span class="btn-close-modal" onclick="fecharModal()">×</span>
+    <div id="modalImagem" onclick="fecharModal()">
+        <span class="btn-close-modal">×</span>
         <img id="imgExpandida" src="">
     </div>
 
@@ -157,31 +103,20 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
-        // --- SCRIPT PARA BLOQUEAR ARRASTO DE ATUALIZAÇÃO ---
-        window.addEventListener('load', function() {
-            let lastTouchY = 0;
-            document.addEventListener('touchstart', function(e) {
-                lastTouchY = e.touches[0].clientY;
-            }, { passive: false });
+        // --- BLOQUEIO DE RECARREGAMENTO APK ---
+        let ts;
+        document.addEventListener('touchstart', (e) => { ts = e.touches[0].clientY; }, {passive: false});
+        document.addEventListener('touchmove', (e) => {
+            if (window.scrollY === 0 && e.touches[0].clientY > ts) e.preventDefault();
+        }, {passive: false});
 
-            document.addEventListener('touchmove', function(e) {
-                let touchY = e.touches[0].clientY;
-                // Se estiver no topo da página e tentar puxar para baixo, bloqueia
-                if (window.pageYOffset === 0 && touchY > lastTouchY) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-        });
-
+        // --- CONFIG MAPA ---
         var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-26.24, -48.82], 14);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
         var userLat, userLng, controleRota, userMarker;
-        var btnCancelar = document.getElementById('btnCancelar');
-        var btnGps = document.querySelector('.btn-fab.gps');
-
-        var iconeHidrante = L.icon({ iconUrl: 'hidrante.png', iconSize: [25, 25], iconAnchor: [12, 25], popupAnchor: [0, -25] });
-        var iconeUnidade = L.icon({ iconUrl: 'logo_unidade_10.png', iconSize: [25, 25], iconAnchor: [12, 25], popupAnchor: [0, -25] });
+        var iconeHidrante = L.icon({ iconUrl: 'hidrante.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] });
+        var iconeUnidade = L.icon({ iconUrl: 'logo_unidade_10.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] });
 
         var locais = [
             { nome: "Unidade 10 - Westrupp", ref: "📍 Unidade 10", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", imagem: "unidade_foto.png" },
@@ -192,109 +127,87 @@
             { nome: "R. Guaíra, 1404", ref: "📍 Em frente ao posto", lat: -26.261370, lng: -48.817416, tipo: "hidrante", imagem: "hidrante5.png" }
         ];
 
-        function calcularDistancia(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+        // --- FUNÇÕES DE INTERAÇÃO ---
+        function abrirModal(src) {
+            const m = document.getElementById('modalImagem');
+            document.getElementById('imgExpandida').src = src;
+            m.style.display = 'flex';
         }
 
-        locais.forEach(function(local) {
-            var icone = (local.tipo === "unidade") ? iconeUnidade : iconeHidrante;
-            var marker = L.marker([local.lat, local.lng], { icon: icone }).addTo(map);
-            
-            marker.on('click', function() {
-                let etaInfo = "📍 Localize-se para ver tempo";
-                if (userLat && userLng) {
-                    const distReal = calcularDistancia(userLat, userLng, local.lat, local.lng) * 1.3;
-                    const tempo = Math.round((distReal / 40) * 60);
-                    etaInfo = `⏱️ Est.: <b>${tempo} min</b> (${distReal.toFixed(1)} km)`;
-                }
-
-                var popupContent = `
-                    <div class="card-popup">
-                        <div class="card-header" onclick="abrirModal('${local.imagem}')">
-                            <img src="${local.imagem}" class="card-img" onerror="this.src='https://via.placeholder.com/260x140?text=Sem+Foto'">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title">${local.nome}</h3>
-                            <div class="card-ref">${local.ref}</div>
-                            <span class="card-eta">${etaInfo}</span>
-                            <div class="area-botoes">
-                                <button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})">🚀 ROTA INTERNA</button>
-                                <button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Google_Maps_icon_%282015-2020%29.svg"> GOOGLE MAPS
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                marker.bindPopup(popupContent).openPopup();
-            });
-        });
-
-        function minhaLocalizacao() {
-            if (!navigator.geolocation) return mostrarAviso("⚠️ GPS não suportado");
-            btnGps.innerHTML = '⌛';
-            navigator.geolocation.getCurrentPosition(
-                function(pos) {
-                    userLat = pos.coords.latitude; userLng = pos.coords.longitude;
-                    if (userMarker) map.removeLayer(userMarker);
-                    userMarker = L.circleMarker([userLat, userLng], { radius: 10, fillColor: "#1a73e8", color: "white", weight: 3, fillOpacity: 0.9 }).addTo(map);
-                    map.flyTo([userLat, userLng], 16);
-                    btnGps.innerHTML = '📍';
-                }, 
-                function() { btnGps.innerHTML = '📍'; mostrarAviso("❌ Erro GPS"); }, 
-                { enableHighAccuracy: true }
-            );
+        function fecharModal() {
+            document.getElementById('modalImagem').style.display = 'none';
         }
 
-        function tracarRota(destLat, destLng) {
-            if (!userLat) { mostrarAviso("📍 Localize-se primeiro"); minhaLocalizacao(); return; }
-            if (controleRota) map.removeControl(controleRota);
-
-            controleRota = L.Routing.control({
-                waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
-                lineOptions: {
-                    styles: [
-                        { color: 'white', opacity: 0.8, weight: 11 },
-                        { color: '#1a73e8', opacity: 0.9, weight: 7 }
-                    ]
-                },
-                createMarker: function() { return null; },
-                addWaypoints: false, 
-                show: false
-            }).addTo(map);
-
-            btnCancelar.style.display = 'flex';
-            map.closePopup();
-        }
-
-        function abrirGoogleMaps(destLat, destLng) {
-            let url = userLat 
-                ? `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destLat},${destLng}&travelmode=driving`
-                : `https://www.google.com/maps/search/?api=1&query=${destLat},${destLng}`;
+        function abrirGoogleMaps(lat, lng) {
+            // Formato que força o app do Maps a abrir
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
             window.open(url, '_blank');
         }
 
+        function tracarRota(lat, lng) {
+            if (!userLat) { alert("Ative o GPS primeiro"); minhaLocalizacao(); return; }
+            if (controleRota) map.removeControl(controleRota);
+            
+            controleRota = L.Routing.control({
+                waypoints: [L.latLng(userLat, userLng), L.latLng(lat, lng)],
+                lineOptions: { styles: [{color: '#1a73e8', weight: 6}] },
+                createMarker: () => null,
+                addWaypoints: false,
+                show: false
+            }).addTo(map);
+            
+            document.getElementById('btnCancelar').style.display = 'flex';
+            map.closePopup();
+        }
+
         function cancelarRota() {
-            if (controleRota) { map.removeControl(controleRota); controleRota = null; btnCancelar.style.display = 'none'; }
+            if (controleRota) map.removeControl(controleRota);
+            document.getElementById('btnCancelar').style.display = 'none';
         }
 
-        function mostrarAviso(msg) {
-            const alerta = document.getElementById('custom-alert');
-            alerta.innerText = msg; alerta.style.display = 'block';
-            alerta.style.animation = 'none'; alerta.offsetHeight; 
-            alerta.style.animation = 'fadeInOut 3s forwards';
+        function minhaLocalizacao() {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                userLat = pos.coords.latitude; userLng = pos.coords.longitude;
+                if (userMarker) map.removeLayer(userMarker);
+                userMarker = L.circleMarker([userLat, userLng], { radius: 8, color: 'white', fillColor: '#1a73e8', fillOpacity: 1, weight: 3 }).addTo(map);
+                map.flyTo([userLat, userLng], 15);
+            }, null, {enableHighAccuracy: true});
         }
 
-        function abrirModal(src) { document.getElementById('imgExpandida').src = src; document.getElementById('modalImagem').style.display = 'flex'; }
-        function fecharModal() { document.getElementById('modalImagem').style.display = 'none'; }
+        // --- RENDERIZAR MARCADORES ---
+        locais.forEach(local => {
+            const marker = L.marker([local.lat, local.lng], { 
+                icon: local.tipo === "unidade" ? iconeUnidade : iconeHidrante 
+            }).addTo(map);
 
-        window.onload = function() {
-            minhaLocalizacao();
-        };
+            marker.bindPopup(() => {
+                let eta = "Ative o GPS";
+                if(userLat) {
+                    const d = map.distance([userLat, userLng], [local.lat, local.lng]) / 1000;
+                    eta = `${Math.round(d * 2)} min (${d.toFixed(1)} km)`;
+                }
+
+                return `
+                <div class="card-popup">
+                    <div class="card-header">
+                        <img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/260x140?text=Sem+Foto'">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">${local.nome}</div>
+                        <div class="card-ref">${local.ref}</div>
+                        <div class="card-eta">⏱️ ${eta}</div>
+                        <div class="area-botoes">
+                            <button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})">🚀 TRAÇAR ROTA</button>
+                            <button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Google_Maps_icon_%282015-2020%29.svg"> GOOGLE MAPS
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        });
+
+        window.onload = minhaLocalizacao;
     </script>
 </body>
 </html>
