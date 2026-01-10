@@ -53,19 +53,29 @@
             left: 50%;
             transform: translateX(-50%);
             background: var(--bg-glass);
-            padding: 10px 24px;
-            border-radius: 50px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            /* Ajustado para parecer mais um card centralizado */
             z-index: 1000;
             box-shadow: var(--shadow-soft);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5);
+            width: 85%;
+            /* Define uma largura para ajudar na centralização do texto */
+            max-width: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .header-floating h1 {
             margin: 0;
-            font-size: 15px;
+            font-size: 14px;
             color: #333;
             font-weight: 700;
+            text-align: center;
+            /* Centraliza as linhas de texto */
+            line-height: 1.3;
         }
 
         .controles-flutuantes {
@@ -230,7 +240,7 @@
 <body>
 
     <div class="header-floating">
-        <h1>🚒 Hidrantes - Reg. Leste</h1>
+        <h1>🚒 Hidrantes - Unidade 10</h1>
     </div>
 
     <div class="controles-flutuantes">
@@ -292,7 +302,7 @@
             // No APK, o window.open às vezes falha. Usar o location.href é mais seguro.
             window.location.href = url;
         }
- 
+
         function tracarRota(lat, lng) {
             if (!userLat) { alert("Ative o GPS primeiro"); minhaLocalizacao(); return; }
             if (controleRota) map.removeControl(controleRota);
