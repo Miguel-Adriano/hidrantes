@@ -27,19 +27,14 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
             overscroll-behavior: none;
-            position: fixed;
-            left: 0;
-            top: 0;
+            position: fixed; left: 0; top: 0;
         }
 
         #map {
@@ -48,7 +43,7 @@
             z-index: 1;
         }
 
-        /* HEADER */
+        /* --- CABEÇALHO --- */
         .header-floating {
             position: absolute;
             top: 15px;
@@ -77,7 +72,7 @@
             white-space: nowrap;
         }
 
-        /* CONTROLES FLUTUANTES (BOTÕES REDONDOS) */
+        /* --- CONTROLES FLUTUANTES --- */
         .controles-flutuantes {
             position: absolute;
             bottom: 30px;
@@ -86,7 +81,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            pointer-events: none; /* Permite clicar no mapa através da área vazia */
+            pointer-events: none;
         }
 
         .btn-fab {
@@ -103,21 +98,13 @@
             transition: transform 0.2s ease, background-color 0.2s;
         }
 
-        .btn-fab:active {
-            transform: scale(0.95);
-        }
+        .btn-fab:active { transform: scale(0.95); }
 
         .btn-fab svg {
-            width: 28px;
-            height: 28px;
-            fill: white;
+            width: 28px; height: 28px; fill: white;
         }
 
-        .btn-fab.gps {
-            background: var(--primary-blue);
-        }
-        
-        /* Classe para indicar que está seguindo o usuário */
+        .btn-fab.gps { background: var(--primary-blue); }
         .btn-fab.gps.seguindo {
             background: var(--primary-blue-dark);
             border: 2px solid white;
@@ -128,174 +115,194 @@
             display: none;
         }
 
-        /* ESTILO DO POPUP */
+        /* --- ÍCONES PERSONALIZADOS NO MAPA (HIDRANTES/UNIDADE) --- */
+        .custom-marker-pin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% 50% 50% 0;
+            position: absolute;
+            transform: rotate(-45deg);
+            left: 50%;
+            top: 50%;
+            margin: -20px 0 0 -20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            transition: all 0.2s ease;
+        }
+
+        .custom-marker-pin svg {
+            width: 22px;
+            height: 22px;
+            transform: rotate(45deg);
+            fill: white;
+        }
+
+        .marker-hidrante { background: #D32F2F; }
+        .marker-unidade { background: #1a73e8; z-index: 100; }
+
+        /* --- ÍCONE DO USUÁRIO (PESSOA) COM PULSO --- */
+        .user-pin {
+            width: 20px;
+            height: 20px;
+            background: #1a73e8;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Animação de radar no usuário */
+        .user-pulse {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px; height: 20px;
+            background: rgba(26, 115, 232, 0.4);
+            border-radius: 50%;
+            animation: user-pulsate 2s infinite;
+            z-index: 1;
+        }
+
+        @keyframes user-pulsate {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+        }
+
+        /* --- ESTILO DO POPUP --- */
         .leaflet-popup-content-wrapper {
             border-radius: 16px;
             padding: 0;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-
         .leaflet-popup-content {
             margin: 0 !important;
             width: 280px !important;
         }
-
         .leaflet-container a.leaflet-popup-close-button {
-            top: 10px;
-            right: 10px;
+            top: 10px; right: 10px;
             color: white;
             background: rgba(0,0,0,0.3);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
             font: 20px/14px Tahoma, Verdana, sans-serif;
             text-shadow: none;
         }
 
-        .card-popup {
-            display: flex;
-            flex-direction: column;
-        }
-
+        .card-popup { display: flex; flex-direction: column; }
         .card-header {
             height: 150px;
             background-color: #eee;
             overflow: hidden;
             position: relative;
         }
-
         .card-img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
             cursor: pointer;
         }
-
-        .card-body {
-            padding: 16px;
-            text-align: center;
-        }
-
+        .card-body { padding: 16px; text-align: center; }
         .card-title {
             margin: 0 0 4px 0;
             font-size: 17px;
             font-weight: 700;
             color: #222;
         }
-
         .card-ref {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 12px;
+            font-size: 13px; color: #666; margin-bottom: 12px;
         }
-
         .card-eta {
             color: var(--primary-blue);
-            font-weight: 700;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 14px;
-            background: #e8f0fe;
-            padding: 6px;
+            font-weight: 700; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; margin-bottom: 14px;
+            background: #e8f0fe; padding: 6px;
             border-radius: 8px;
         }
-
         .area-botoes {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            display: flex; flex-direction: column; gap: 10px;
         }
-
         .btn-rota {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
+            width: 100%; padding: 12px;
+            border: none; border-radius: 12px;
+            font-weight: 600; font-size: 14px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: filter 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; transition: filter 0.2s;
         }
-
-        .btn-rota svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .btn-interno {
-            background: var(--success-green);
-            color: white;
-            fill: white;
-        }
-
+        .btn-rota svg { width: 20px; height: 20px; }
+        .btn-interno { background: var(--success-green); color: white; fill: white; }
         .btn-google {
-            background: #fff;
-            color: #444;
-            fill: #444;
+            background: #fff; color: #444; fill: #444;
             border: 1px solid #ddd;
         }
+        .btn-google img { width: 20px; height: 20px; }
+        .btn-rota:active { filter: brightness(0.9); }
 
-        .btn-rota:active {
-            filter: brightness(0.9);
-        }
-
-        /* Modal de Imagem Expandida */
-        #modalImagem {
+        /* --- ALERT CUSTOMIZADO --- */
+        .alert-overlay {
             display: none;
-            position: fixed;
-            z-index: 9999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99999;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .alert-box {
+            background: white;
+            padding: 25px; border-radius: 20px;
+            width: 85%; max-width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .alert-title {
+            font-size: 18px; font-weight: 700;
+            margin-bottom: 10px; color: #333;
+        }
+        .alert-msg {
+            font-size: 15px; color: #666; margin-bottom: 20px; line-height: 1.5;
+        }
+        .alert-btn {
+            background: var(--primary-blue); color: white;
+            border: none; padding: 12px 30px;
+            border-radius: 10px; font-weight: 600; font-size: 16px;
+            width: 100%; cursor: pointer;
+        }
+
+        /* --- MODAL IMAGEM --- */
+        #modalImagem {
+            display: none; position: fixed;
+            z-index: 9999; top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
+            align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
         }
-        
-        #modalImagem.show {
-            opacity: 1;
-        }
-
+        #modalImagem.show { opacity: 1; }
         #imgExpandida {
-            max-width: 95%;
-            max-height: 80%;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 95%; max-height: 80%;
+            border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-
         .btn-close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            background: rgba(255,255,255,0.2);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
+            position: absolute; top: 20px; right: 20px;
+            color: white; background: rgba(255,255,255,0.2);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer;
         }
 
-        .leaflet-routing-container {
-            display: none !important;
-        }
+        .leaflet-routing-container { display: none !important; }
     </style>
 </head>
 
@@ -303,6 +310,14 @@
 
     <div class="header-floating">
         <h1>🚒 Hidrantes - Unidade 10</h1>
+    </div>
+
+    <div id="customAlert" class="alert-overlay">
+        <div class="alert-box">
+            <div class="alert-title" id="alertTitle">Atenção</div>
+            <div class="alert-msg" id="alertMsg">Mensagem aqui</div>
+            <button class="alert-btn" onclick="fecharAlerta()">Entendi</button>
+        </div>
     </div>
 
     <div class="controles-flutuantes">
@@ -326,33 +341,37 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
-        // --- PREVENÇÃO DE REFRESH POR PUXAR ---
+        // --- UX / SISTEMA DE ALERTAS ---
+        function exibirAlerta(titulo, mensagem) {
+            document.getElementById('alertTitle').innerText = titulo;
+            document.getElementById('alertMsg').innerText = mensagem;
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+
+        function fecharAlerta() {
+            document.getElementById('customAlert').style.display = 'none';
+            if(!userLat) iniciarRastreamento();
+        }
+
+        // --- PREVENÇÃO DE REFRESH ---
         let ts;
         document.addEventListener('touchstart', (e) => { ts = e.touches[0].clientY; }, { passive: false });
         document.addEventListener('touchmove', (e) => {
             if (window.scrollY === 0 && e.touches[0].clientY > ts) e.preventDefault();
         }, { passive: false });
 
-        // --- CONFIGURAÇÃO DO MAPA ---
+        // --- INICIALIZAÇÃO DO MAPA ---
         var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-26.24, -48.82], 14);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
-        }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
-        // --- VARIÁVEIS GLOBAIS ---
-        var userLat, userLng, userHeading = 0;
+        var userLat, userLng;
         var controleRota;
         var userMarker;
-        var watchId; // ID para controlar o GPS contínuo
-        var isFollowing = false; // Controle se a câmera deve seguir o user
+        var isFollowing = false;
 
-        // Ícones do Mapa (Mantendo imagens personalizadas para os pontos)
-        var iconeHidrante = L.icon({ iconUrl: 'hidrante.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] });
-        var iconeUnidade = L.icon({ iconUrl: 'logo_unidade_10.png', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36] });
-
-        // --- DADOS ---
+        // --- DADOS (LOCAIS) ---
         var locais = [
-            { nome: "Unidade 10 - Westrupp", ref: "📍 Unidade 10", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", imagem: "unidade_foto.png" },
+            { nome: "Unidade 10 - Westrupp", ref: "📍 Base Operacional", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", imagem: "unidade_foto.png" },
             { nome: "R. Jacupiranga, 873", ref: "📍 Em frente a Agropecuária", lat: -26.239652, lng: -48.808429, tipo: "hidrante", imagem: "hidrante1.png" },
             { nome: "Estr. Timbé, 6193", ref: "📍 Em frente ao posto policial", lat: -26.218075, lng: -48.818592, tipo: "hidrante", imagem: "hidrante2.png" },
             { nome: "Av. Santos Dumont, 3505", ref: "📍 Próximo ao motel Libidus", lat: -26.245698, lng: -48.840077, tipo: "hidrante", imagem: "hidrante3.png" },
@@ -360,98 +379,144 @@
             { nome: "R. Guaíra, 1404", ref: "📍 Em frente ao posto", lat: -26.261370, lng: -48.817416, tipo: "hidrante", imagem: "hidrante5.png" }
         ];
 
-        // --- SISTEMA DE GEOLOCALIZAÇÃO INTELIGENTE ---
-        
+        const svgHidrante = '<svg viewBox="0 0 24 24"><path d="M19 12h-2V8h2V6h-2V4h-2V2h-6v2H7v2H5v2h2v4H5v2h2v6h10v-6h2v-2zM9 12V8h6v4H9z"/></svg>';
+        const svgUnidade = '<svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>';
+
+        // --- GERAÇÃO DOS MARCADORES ---
+        locais.forEach(local => {
+            let classeCor = local.tipo === "unidade" ? "marker-unidade" : "marker-hidrante";
+            let svgIcone = local.tipo === "unidade" ? svgUnidade : svgHidrante;
+            
+            // REMOVI O PULSO DAQUI (DA UNIDADE)
+
+            const customIcon = L.divIcon({
+                className: 'custom-div-icon', 
+                html: `
+                    <div class="custom-marker-pin ${classeCor}">
+                        ${svgIcone}
+                    </div>
+                `,
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -45]
+            });
+
+            const marker = L.marker([local.lat, local.lng], {
+                icon: customIcon
+            }).addTo(map);
+
+            marker.bindPopup(() => {
+                let distTexto = "Calculando...";
+                if (userLat) {
+                    const d = map.distance([userLat, userLng], [local.lat, local.lng]);
+                    distTexto = d > 1000 ? (d/1000).toFixed(1) + " km" : Math.round(d) + " m";
+                }
+
+                return `
+                <div class="card-popup">
+                    <div class="card-header">
+                        <img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/280x150?text=Sem+Imagem'">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">${local.nome}</div>
+                        <div class="card-ref">${local.ref}</div>
+                        <div class="card-eta">
+                            <svg style="width:16px;height:16px;fill:var(--primary-blue)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            Distância: ${distTexto}
+                        </div>
+                        <div class="area-botoes">
+                            <button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})">
+                                <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                                TRAÇAR ROTA
+                            </button>
+                            <button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" alt="Google Maps">
+                                ABRIR NO MAPS
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        });
+
+        // --- FUNÇÕES DE GPS ---
         function iniciarRastreamento() {
             if ("geolocation" in navigator) {
-                // Configurações para alta precisão
-                const options = {
-                    enableHighAccuracy: true,
-                    maximumAge: 0,
-                    timeout: 5000
-                };
-
-                watchId = navigator.geolocation.watchPosition(atualizarPosicao, erroGps, options);
+                const options = { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
+                navigator.geolocation.watchPosition(atualizarPosicao, erroGps, options);
                 isFollowing = true;
                 atualizarBotaoGps();
             } else {
-                alert("GPS não suportado neste dispositivo.");
+                exibirAlerta("Erro", "GPS não suportado neste aparelho.");
             }
         }
 
         function atualizarPosicao(position) {
             userLat = position.coords.latitude;
             userLng = position.coords.longitude;
-            var accuracy = position.coords.accuracy;
 
-            // Se o marcador ainda não existe, cria
+            // CRIAÇÃO DO ÍCONE DA PESSOA COM PULSO
             if (!userMarker) {
-                userMarker = L.circleMarker([userLat, userLng], {
-                    radius: 8,
-                    color: '#fff',
-                    weight: 3,
-                    fillColor: '#1a73e8',
-                    fillOpacity: 1,
-                    boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+                const userIcon = L.divIcon({
+                    className: 'custom-user-icon', // Classe vazia
+                    html: `
+                        <div class="user-pulse"></div>
+                        <div class="user-pin"></div>
+                    `,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10] // Metade do tamanho para centralizar
+                });
+
+                userMarker = L.marker([userLat, userLng], {
+                    icon: userIcon,
+                    zIndexOffset: 1000 // Garante que a pessoa fique por cima de tudo
                 }).addTo(map);
             } else {
-                // Atualiza posição suavemente
                 userMarker.setLatLng([userLat, userLng]);
             }
 
-            // Se o modo "Seguir" estiver ativo, centraliza o mapa
             if (isFollowing) {
-                map.flyTo([userLat, userLng], map.getZoom() < 15 ? 15 : map.getZoom(), {
-                    animate: true,
-                    duration: 0.5
-                });
+                map.flyTo([userLat, userLng], map.getZoom() < 15 ? 15 : map.getZoom(), { animate: true, duration: 0.5 });
             }
         }
 
         function erroGps(err) {
-            console.warn('ERRO GPS(' + err.code + '): ' + err.message);
+            console.warn("GPS Alert: " + err.message);
         }
 
-        // Função chamada pelo botão de GPS
         function ativarSeguimento() {
             if (!userLat) {
                 iniciarRastreamento();
-            }
-            isFollowing = true;
-            if (userLat) {
+                exibirAlerta("Ative o GPS", "Por favor, ative a localização do celular para ver sua posição no mapa.");
+            } else {
+                isFollowing = true;
                 map.flyTo([userLat, userLng], 16);
+                atualizarBotaoGps();
             }
-            atualizarBotaoGps();
         }
 
         function atualizarBotaoGps() {
             const btn = document.getElementById('btnGps');
             if (isFollowing) {
                 btn.classList.add('seguindo');
-                // Ícone de "GPS Fixo"
                 btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
             } else {
                 btn.classList.remove('seguindo');
-                // Ícone de "Procurar GPS"
-                btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>'; // Trocando para ícone genérico ou mantendo o target
-                btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
+                btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>';
             }
         }
 
-        // Detecta se o usuário arrastou o mapa manualmente para parar de seguir
         map.on('dragstart', function() {
             isFollowing = false;
             atualizarBotaoGps();
         });
 
-        // --- FUNÇÕES DE ROTA E INTERFACE ---
-        
+        // --- MODAL DE FOTO ---
         function abrirModal(src) {
             const m = document.getElementById('modalImagem');
             const img = document.getElementById('imgExpandida');
             img.src = src;
             m.style.display = 'flex';
-            // Pequeno delay para animação CSS
             setTimeout(() => m.classList.add('show'), 10);
         }
 
@@ -461,13 +526,14 @@
             setTimeout(() => m.style.display = 'none', 300);
         }
 
+        // --- FUNÇÕES DE ROTA ---
         function abrirGoogleMaps(lat, lng) {
-            window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+            window.location.href = `https://www.google.com/maps/dir/?api=1&destination=$${lat},${lng}&travelmode=driving`;
         }
 
         function tracarRota(destLat, destLng) {
             if (!userLat) { 
-                alert("Aguardando sinal de GPS..."); 
+                exibirAlerta("Aguardando GPS", "O sistema está buscando sua localização. Verifique se o GPS está ativo.");
                 ativarSeguimento();
                 return; 
             }
@@ -476,11 +542,10 @@
 
             controleRota = L.Routing.control({
                 waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
-                // ESTILO DA ROTA MELHORADO (EFEITO BORDA)
                 lineOptions: { 
                     styles: [
-                        { color: 'white', opacity: 0.9, weight: 9 }, // Borda Branca
-                        { color: '#1a73e8', opacity: 1, weight: 5 }  // Linha Azul
+                        { color: 'white', opacity: 0.9, weight: 9 }, 
+                        { color: '#1a73e8', opacity: 1, weight: 5 }
                     ] 
                 },
                 createMarker: () => null,
@@ -489,14 +554,8 @@
                 show: false
             }).addTo(map);
 
-            // Botão cancelar aparece
-            const btnCancel = document.getElementById('btnCancelar');
-            btnCancel.style.display = 'flex';
-            
-            // Fecha popup para limpar visão
+            document.getElementById('btnCancelar').style.display = 'flex';
             map.closePopup();
-            
-            // Reativa o seguimento para navegação
             ativarSeguimento();
         }
 
@@ -508,52 +567,14 @@
             document.getElementById('btnCancelar').style.display = 'none';
         }
 
-        // --- RENDERIZAÇÃO DOS MARCADORES ---
-        locais.forEach(local => {
-            const marker = L.marker([local.lat, local.lng], {
-                icon: local.tipo === "unidade" ? iconeUnidade : iconeHidrante
-            }).addTo(map);
-
-            marker.bindPopup(() => {
-                let distTexto = "Calculando...";
-                if (userLat) {
-                    const d = map.distance([userLat, userLng], [local.lat, local.lng]);
-                    if (d > 1000) distTexto = (d/1000).toFixed(1) + " km";
-                    else distTexto = Math.round(d) + " m";
+        window.onload = function() {
+            iniciarRastreamento();
+            setTimeout(() => {
+                if(!userLat) {
+                    exibirAlerta("Permissão de GPS", "Para conseguir visualizar, precisamos que ative o GPS.");
                 }
-
-                // Conteúdo do Popup com SVGs
-                return `
-                <div class="card-popup">
-                    <div class="card-header">
-                        <img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/280x150?text=Sem+Imagem'">
-                    </div>
-                    <div class="card-body">
-                        <div class="card-title">${local.nome}</div>
-                        <div class="card-ref">${local.ref}</div>
-                        
-                        <div class="card-eta">
-                            <svg style="width:16px;height:16px;fill:var(--primary-blue)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            Distância: ${distTexto}
-                        </div>
-
-                        <div class="area-botoes">
-                            <button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})">
-                                <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-                                TRAÇAR ROTA
-                            </button>
-                            <button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                                ABRIR NO MAPS
-                            </button>
-                        </div>
-                    </div>
-                </div>`;
-            });
-        });
-
-        // Inicia GPS ao carregar
-        iniciarRastreamento();
+            }, 3000);
+        };
     </script>
 </body>
 </html>
