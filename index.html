@@ -14,37 +14,29 @@
 
     <style>
         /* Cores de Status */
-        .marker-ok { background: #D32F2F !important; border-color: #fff !important; } /* Vermelho */
-        .marker-atencao { background: #F57C00 !important; border-color: #fff !important; } /* Laranja */
-        .marker-defeito { background: #424242 !important; border-color: #fff !important; } /* Cinza Escuro */
+        .marker-ok { background: #D32F2F !important; border-color: #fff !important; }
+        .marker-atencao { background: #F57C00 !important; border-color: #fff !important; }
+        .marker-defeito { background: #424242 !important; border-color: #fff !important; }
         
         /* Badge dentro do Popup */
         .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 5px;
-            text-transform: uppercase;
+            display: inline-block; padding: 4px 12px; border-radius: 12px;
+            font-size: 12px; font-weight: 700; color: white;
+            margin-bottom: 5px; text-transform: uppercase;
         }
         .badge-ok { background: #D32F2F; }
         .badge-atencao { background: #F57C00; }
         .badge-defeito { background: #424242; }
 
         .data-verificacao {
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 10px;
-            font-style: italic;
+            font-size: 11px; color: #888; margin-bottom: 10px; font-style: italic;
         }
     </style>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            emailjs.init("6Iwr2DHnSFRpj3_EZ"); // Sua chave pública
+            emailjs.init("6Iwr2DHnSFRpj3_EZ");
         })();
     </script>
 </head>
@@ -74,12 +66,8 @@
                 <div class="form-group">
                     <label class="form-label">O hidrante funciona?</label>
                     <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="funciona" value="Sim" onchange="togglePressao()" checked> Sim
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="funciona" value="Não" onchange="togglePressao()"> Não
-                        </label>
+                        <label class="radio-label"><input type="radio" name="funciona" value="Sim" onchange="togglePressao()" checked> Sim</label>
+                        <label class="radio-label"><input type="radio" name="funciona" value="Não" onchange="togglePressao()"> Não</label>
                     </div>
                 </div>
                 <div class="form-group" id="divPressao">
@@ -158,7 +146,7 @@
             emailjs.send("service_12bdfek", "template_hwj670q", templateParams)
                 .then(function (response) {
                     fecharAvaliacao();
-                    exibirAlerta("Sucesso", "Avaliação enviada! Em breve será atualizada.");
+                    exibirAlerta("Sucesso", "Avaliação enviada!");
                     btn.innerText = "Enviar Avaliação"; btn.disabled = false;
                 }, function (error) {
                     exibirAlerta("Erro", "Falha ao enviar e-mail.");
@@ -175,152 +163,82 @@
 
         var userLat, userLng, controleRota, userMarker, isFollowing = false;
 
-        // --- DADOS EDITÁVEIS (AQUI VOCÊ MUDA O STATUS NA MÃO) ---
-        // Opções de status: 'ok', 'atencao', 'defeito', 'unidade'
         var locais = [
-            { 
-                nome: "Unidade 10", 
-                ref: "📍 Unidade Operacional", 
-                lat: -26.2381359, lng: -48.8112366, 
-                tipo: "unidade", status: "unidade", imagem: "unidade_foto.png" 
-            },
-            { 
-                nome: "R. Jacupiranga, 873", 
-                ref: "📍 Em frente a Agropecuária", 
-                lat: -26.239652, lng: -48.808429, 
-                tipo: "hidrante", status: "ok", imagem: "hidrante1.png", // <--- EDITE AQUI
-                ultima_verificacao: "12/01/2026"
-            },
-            { 
-                nome: "Estr. Timbé, 6193", 
-                ref: "📍 Em frente ao posto policial", 
-                lat: -26.218075, lng: -48.818592, 
-                tipo: "hidrante", status: "atencao", imagem: "hidrante2.png", // <--- EDITE AQUI
-                ultima_verificacao: "10/11/2025"
-            },
-            { 
-                nome: "Av. Santos Dumont, 3505", 
-                ref: "📍 Próximo ao motel Libidus", 
-                lat: -26.245698, lng: -48.840077, 
-                tipo: "hidrante", status: "defeito", imagem: "hidrante3.png", // <--- EDITE AQUI
-                ultima_verificacao: "05/01/2026"
-            },
-            { 
-                nome: "R. Tuiuti, 2411", 
-                ref: "📍 Em frente ao Mercado Cooper", 
-                lat: -26.251597, lng: -48.819645, 
-                tipo: "hidrante", status: "ok", imagem: "hidrante4.png", // <--- EDITE AQUI
-                ultima_verificacao: "12/01/2026"
-            },
-            { 
-                nome: "R. Guaíra, 1404", 
-                ref: "📍 Em frente ao posto", 
-                lat: -26.261370, lng: -48.817416, 
-                tipo: "hidrante", status: "ok", imagem: "hidrante5.png", // <--- EDITE AQUI
-                ultima_verificacao: "08/01/2026"
-            }
+            { nome: "Unidade 10", ref: "📍 Unidade Operacional", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", status: "unidade", imagem: "unidade_foto.png" },
+            { nome: "R. Jacupiranga, 873", ref: "📍 Em frente a Agropecuária", lat: -26.239652, lng: -48.808429, tipo: "hidrante", status: "ok", imagem: "hidrante1.png", ultima_verificacao: "12/01/2026" },
+            { nome: "Estr. Timbé, 6193", ref: "📍 Em frente ao posto policial", lat: -26.218075, lng: -48.818592, tipo: "hidrante", status: "atencao", imagem: "hidrante2.png", ultima_verificacao: "10/11/2025" },
+            { nome: "Av. Santos Dumont, 3505", ref: "📍 Próximo ao motel Libidus", lat: -26.245698, lng: -48.840077, tipo: "hidrante", status: "defeito", imagem: "hidrante3.png", ultima_verificacao: "05/01/2026" },
+            { nome: "R. Tuiuti, 2411", ref: "📍 Em frente ao Mercado Cooper", lat: -26.251597, lng: -48.819645, tipo: "hidrante", status: "ok", imagem: "hidrante4.png", ultima_verificacao: "12/01/2026" },
+            { nome: "R. Guaíra, 1404", ref: "📍 Em frente ao posto", lat: -26.261370, lng: -48.817416, tipo: "hidrante", status: "ok", imagem: "hidrante5.png", ultima_verificacao: "08/01/2026" }
         ];
 
         const svgHidrante = '<svg viewBox="0 0 24 24"><path d="M19 12h-2V8h2V6h-2V4h-2V2h-6v2H7v2H5v2h2v4H5v2h2v6h10v-6h2v-2zM9 12V8h6v4H9z"/></svg>';
         const svgUnidade = '<svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>';
 
         locais.forEach(local => {
-            // Lógica para definir a cor baseada no STATUS escrito no código
-            let classeCor = "";
-            let textoStatus = "";
-            let badgeClass = "";
-
-            if (local.tipo === "unidade") {
-                classeCor = "marker-unidade";
-            } else {
-                if (local.status === 'ok') {
-                    classeCor = "marker-ok";
-                    textoStatus = "Operacional";
-                    badgeClass = "badge-ok";
-                } else if (local.status === 'atencao') {
-                    classeCor = "marker-atencao";
-                    textoStatus = "Baixa Pressão";
-                    badgeClass = "badge-atencao";
-                } else if (local.status === 'defeito') {
-                    classeCor = "marker-defeito";
-                    textoStatus = "Inoperante";
-                    badgeClass = "badge-defeito";
-                } else {
-                    classeCor = "marker-hidrante"; // Vermelho padrão
-                    textoStatus = "Sem dados";
-                }
+            let classeCor = ""; let textoStatus = ""; let badgeClass = "";
+            if (local.tipo === "unidade") { classeCor = "marker-unidade"; }
+            else {
+                if (local.status === 'ok') { classeCor = "marker-ok"; textoStatus = "Operacional"; badgeClass = "badge-ok"; }
+                else if (local.status === 'atencao') { classeCor = "marker-atencao"; textoStatus = "Baixa Pressão"; badgeClass = "badge-atencao"; }
+                else if (local.status === 'defeito') { classeCor = "marker-defeito"; textoStatus = "Inoperante"; badgeClass = "badge-defeito"; }
+                else { classeCor = "marker-hidrante"; textoStatus = "Sem dados"; }
             }
-
-            let svgIcone = local.tipo === "unidade" ? svgUnidade : svgHidrante;
-
-            const customIcon = L.divIcon({
-                className: 'custom-div-icon',
-                html: `<div class="custom-marker-pin ${classeCor}">${svgIcone}</div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 40],
-                popupAnchor: [0, -45]
-            });
-
+            const customIcon = L.divIcon({ className: 'custom-div-icon', html: `<div class="custom-marker-pin ${classeCor}">${local.tipo==="unidade"?svgUnidade:svgHidrante}</div>`, iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -45] });
             const marker = L.marker([local.lat, local.lng], { icon: customIcon }).addTo(map);
 
             marker.bindPopup(() => {
                 let distTexto = "Calculando...";
-                if (userLat) {
-                    const d = map.distance([userLat, userLng], [local.lat, local.lng]);
-                    distTexto = d > 1000 ? (d / 1000).toFixed(1) + " km" : Math.round(d) + " m";
-                }
+                if (userLat) distTexto = map.distance([userLat, userLng], [local.lat, local.lng]) > 1000 ? (map.distance([userLat, userLng], [local.lat, local.lng])/1000).toFixed(1) + " km" : Math.round(map.distance([userLat, userLng], [local.lat, local.lng])) + " m";
+                
+                let btnAvaliar = local.tipo !== 'unidade' ? `<button class="btn-rota btn-avaliar" onclick="abrirAvaliacao('${local.nome}')"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> AVALIAR HIDRANTE</button>` : '';
+                let statusHtml = local.tipo !== 'unidade' ? `<div class="status-badge ${badgeClass}">${textoStatus}</div><div class="data-verificacao">Última avaliação: ${local.ultima_verificacao || '--/--/----'}</div>` : '';
 
-                let btnAvaliar = '';
-                if (local.tipo !== 'unidade') {
-                    btnAvaliar = `<button class="btn-rota btn-avaliar" onclick="abrirAvaliacao('${local.nome}')">
-                        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                        AVALIAR HIDRANTE</button>`;
-                }
-
-                // Renderiza Badge de status (se não for unidade)
-                let statusHtml = '';
-                if (local.tipo !== 'unidade') {
-                    statusHtml = `
-                        <div class="status-badge ${badgeClass}">${textoStatus}</div>
-                        <div class="data-verificacao">Última avaliação: ${local.ultima_verificacao || '--/--/----'}</div>
-                    `;
-                }
-
-                return `
-                <div class="card-popup">
-                    <div class="card-header"><img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/280x150?text=Sem+Imagem'"></div>
-                    <div class="card-body">
-                        <div class="card-title">${local.nome}</div>
-                        <div class="card-ref">${local.ref}</div>
-                        
-                        ${statusHtml}
-
-                        <div class="card-eta"><svg style="width:16px;height:16px;fill:var(--primary-blue)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Distância: ${distTexto}</div>
-                        <div class="area-botoes">
-                            <button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg> TRAÇAR ROTA</button>
-                            <button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})"><img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg"> ABRIR NO MAPS</button>
-                            ${btnAvaliar}
-                        </div>
-                    </div>
-                </div>`;
+                return `<div class="card-popup"><div class="card-header"><img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/280x150?text=Sem+Imagem'"></div><div class="card-body"><div class="card-title">${local.nome}</div><div class="card-ref">${local.ref}</div>${statusHtml}<div class="card-eta"><svg style="width:16px;height:16px;fill:var(--primary-blue)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Distância: ${distTexto}</div><div class="area-botoes"><button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg> TRAÇAR ROTA</button><button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})"><img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg"> ABRIR NO MAPS</button>${btnAvaliar}</div></div></div>`;
             });
         });
 
-        // --- GPS & MAPA ---
+        // --- GPS & ROTA DINÂMICA ---
         function iniciarRastreamento() {
             if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(atualizarPosicao, erroGps, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+                const options = { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
+                navigator.geolocation.watchPosition(atualizarPosicao, erroGps, options);
                 isFollowing = true; atualizarBotaoGps();
             } else { exibirAlerta("Erro", "GPS não suportado."); }
         }
-        function atualizarPosicao(p) {
-            userLat = p.coords.latitude; userLng = p.coords.longitude;
+
+        function atualizarPosicao(position) {
+            userLat = position.coords.latitude;
+            userLng = position.coords.longitude;
+
+            // 1. Atualiza Marcador
             if (!userMarker) {
                 const ui = L.divIcon({ className: 'custom-user-icon', html: `<div class="user-pulse"></div><div class="user-pin"></div>`, iconSize: [20, 20], iconAnchor: [10, 10] });
                 userMarker = L.marker([userLat, userLng], { icon: ui, zIndexOffset: 1000 }).addTo(map);
-            } else { userMarker.setLatLng([userLat, userLng]); }
-            if (isFollowing) map.flyTo([userLat, userLng], map.getZoom() < 15 ? 15 : map.getZoom(), { animate: true, duration: 0.5 });
+            } else {
+                userMarker.setLatLng([userLat, userLng]);
+            }
+
+            // 2. Centraliza se estiver seguindo
+            if (isFollowing) {
+                map.flyTo([userLat, userLng], map.getZoom() < 15 ? 15 : map.getZoom(), { animate: true, duration: 0.5 });
+            }
+
+            // 3. --- RECALCULAR ROTA SE ELA EXISTIR (Redirecionamento) ---
+            if (controleRota) {
+                // Pega os pontos da rota atual
+                var waypoints = controleRota.getWaypoints();
+                // O último ponto é o destino (não queremos mudar ele)
+                var destino = waypoints[waypoints.length - 1].latLng;
+
+                // Atualiza APENAS o ponto de origem para a posição atual do usuário
+                controleRota.setWaypoints([
+                    L.latLng(userLat, userLng), // Novo início (onde eu estou agora)
+                    destino                     // Mesmo destino
+                ]);
+            }
         }
+
         function erroGps(e) { console.warn(e.message); }
         function ativarSeguimento() { if (!userLat) { iniciarRastreamento(); exibirAlerta("GPS", "Ative o GPS."); } else { isFollowing = true; map.flyTo([userLat, userLng], 16); atualizarBotaoGps(); } }
         function atualizarBotaoGps() {
@@ -332,7 +250,28 @@
         function abrirModal(s) { const m = document.getElementById('modalImagem'); document.getElementById('imgExpandida').src = s; m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
         function fecharModal() { const m = document.getElementById('modalImagem'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
         function abrirGoogleMaps(lat, lng) { window.location.href = `https://www.google.com/maps/dir/?api=1&destination=$${lat},${lng}&travelmode=driving`; }
-        function tracarRota(dLa, dLn) { if (!userLat) { ativarSeguimento(); return; } if (controleRota) map.removeControl(controleRota); controleRota = L.Routing.control({ waypoints: [L.latLng(userLat, userLng), L.latLng(dLa, dLn)], lineOptions: { styles: [{ color: 'white', opacity: 0.9, weight: 9 }, { color: '#1a73e8', opacity: 1, weight: 5 }] }, createMarker: () => null, addWaypoints: false, draggableWaypoints: false, show: false }).addTo(map); document.getElementById('btnCancelar').style.display = 'flex'; map.closePopup(); ativarSeguimento(); }
+        
+        function tracarRota(dLa, dLn) { 
+            if (!userLat) { ativarSeguimento(); return; } 
+            
+            // Se já tem rota, remove
+            if (controleRota) map.removeControl(controleRota); 
+            
+            // Cria nova rota
+            controleRota = L.Routing.control({ 
+                waypoints: [L.latLng(userLat, userLng), L.latLng(dLa, dLn)], 
+                lineOptions: { styles: [{ color: 'white', opacity: 0.9, weight: 9 }, { color: '#1a73e8', opacity: 1, weight: 5 }] }, 
+                createMarker: () => null, 
+                addWaypoints: false, 
+                draggableWaypoints: false, 
+                show: false 
+            }).addTo(map); 
+            
+            document.getElementById('btnCancelar').style.display = 'flex'; 
+            map.closePopup(); 
+            ativarSeguimento(); 
+        }
+        
         function cancelarRota() { if (controleRota) { map.removeControl(controleRota); controleRota = null; } document.getElementById('btnCancelar').style.display = 'none'; }
         window.onload = function () { iniciarRastreamento(); setTimeout(() => { if (!userLat) exibirAlerta("Permissão", "Ative o GPS."); }, 3000); };
     </script>
