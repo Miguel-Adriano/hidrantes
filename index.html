@@ -104,7 +104,7 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
-        // --- UX ---
+        // --- UX / SISTEMA DE ALERTAS ---
         function exibirAlerta(t, m) { document.getElementById('alertTitle').innerText = t; document.getElementById('alertMsg').innerText = m; document.getElementById('customAlert').style.display = 'flex'; }
         function fecharAlerta() { document.getElementById('customAlert').style.display = 'none'; if (!userLat) iniciarRastreamento(); }
 
@@ -155,6 +155,7 @@
         }
 
         // --- MAPA ---
+        // Previne refresh ao puxar a tela no celular
         let ts; document.addEventListener('touchstart', e => { ts = e.touches[0].clientY; }, { passive: false });
         document.addEventListener('touchmove', e => { if (window.scrollY === 0 && e.touches[0].clientY > ts) e.preventDefault() }, { passive: false });
 
@@ -162,6 +163,9 @@
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
         var userLat, userLng, controleRota, userMarker, isFollowing = false;
+        
+        // Variável para controlar quando atualizar a rota (evita travamento)
+        var lastRouteUpdatePos = null; 
 
         var locais = [
             { nome: "Unidade 10", ref: "📍 Unidade Operacional", lat: -26.2381359, lng: -48.8112366, tipo: "unidade", status: "unidade", imagem: "unidade_foto.png" },
@@ -198,10 +202,11 @@
             });
         });
 
-        // --- GPS & ROTA DINÂMICA ---
+        // --- GPS & ROTA DINÂMICA (CORRIGIDO) ---
         function iniciarRastreamento() {
             if ("geolocation" in navigator) {
-                const options = { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 };
+                // Diminuí a frequência do GPS para economizar bateria e processamento
+                const options = { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 };
                 navigator.geolocation.watchPosition(atualizarPosicao, erroGps, options);
                 isFollowing = true; atualizarBotaoGps();
             } else { exibirAlerta("Erro", "GPS não suportado."); }
@@ -211,7 +216,7 @@
             userLat = position.coords.latitude;
             userLng = position.coords.longitude;
 
-            // 1. Atualiza Marcador
+            // 1. Cria ou Atualiza o Marcador da Pessoa
             if (!userMarker) {
                 const ui = L.divIcon({ className: 'custom-user-icon', html: `<div class="user-pulse"></div><div class="user-pin"></div>`, iconSize: [20, 20], iconAnchor: [10, 10] });
                 userMarker = L.marker([userLat, userLng], { icon: ui, zIndexOffset: 1000 }).addTo(map);
@@ -219,23 +224,30 @@
                 userMarker.setLatLng([userLat, userLng]);
             }
 
-            // 2. Centraliza se estiver seguindo
+            // 2. Centraliza a câmera se estiver no modo "Seguindo"
             if (isFollowing) {
-                map.flyTo([userLat, userLng], map.getZoom() < 15 ? 15 : map.getZoom(), { animate: true, duration: 0.5 });
+                map.flyTo([userLat, userLng], map.getZoom() < 16 ? 16 : map.getZoom(), { animate: true, duration: 0.8 });
             }
 
-            // 3. --- RECALCULAR ROTA SE ELA EXISTIR (Redirecionamento) ---
+            // 3. ATUALIZAÇÃO INTELIGENTE DA ROTA (FIX)
             if (controleRota) {
-                // Pega os pontos da rota atual
-                var waypoints = controleRota.getWaypoints();
-                // O último ponto é o destino (não queremos mudar ele)
-                var destino = waypoints[waypoints.length - 1].latLng;
+                // Só recalcula se não tiver atualização anterior OU se andou mais de 40 metros
+                // Isso evita o erro 500 (Server Error) por excesso de pedidos
+                if (!lastRouteUpdatePos || map.distance([userLat, userLng], lastRouteUpdatePos) > 40) {
+                    
+                    var waypoints = controleRota.getWaypoints();
+                    var destino = waypoints[waypoints.length - 1].latLng;
 
-                // Atualiza APENAS o ponto de origem para a posição atual do usuário
-                controleRota.setWaypoints([
-                    L.latLng(userLat, userLng), // Novo início (onde eu estou agora)
-                    destino                     // Mesmo destino
-                ]);
+                    // Atualiza o ponto de partida para onde você está agora
+                    controleRota.setWaypoints([
+                        L.latLng(userLat, userLng),
+                        destino
+                    ]);
+                    
+                    // Salva a posição desta atualização
+                    lastRouteUpdatePos = [userLat, userLng];
+                    console.log("Rota recalculada (usuário moveu > 40m)");
+                }
             }
         }
 
@@ -254,25 +266,34 @@
         function tracarRota(dLa, dLn) { 
             if (!userLat) { ativarSeguimento(); return; } 
             
-            // Se já tem rota, remove
             if (controleRota) map.removeControl(controleRota); 
             
-            // Cria nova rota
+            // Configuração OTIMIZADA para evitar erros e travamentos
             controleRota = L.Routing.control({ 
                 waypoints: [L.latLng(userLat, userLng), L.latLng(dLa, dLn)], 
                 lineOptions: { styles: [{ color: 'white', opacity: 0.9, weight: 9 }, { color: '#1a73e8', opacity: 1, weight: 5 }] }, 
                 createMarker: () => null, 
                 addWaypoints: false, 
-                draggableWaypoints: false, 
-                show: false 
+                draggableWaypoints: false,
+                routeWhileDragging: false, // Desativa cálculo ao arrastar (pesado)
+                show: false, // Esconde painel de texto
+                fitSelectedRoutes: false // Não fica dando zoom automático chato
             }).addTo(map); 
             
+            // Salva posição inicial para controle de recálculo
+            lastRouteUpdatePos = [userLat, userLng];
+
             document.getElementById('btnCancelar').style.display = 'flex'; 
             map.closePopup(); 
             ativarSeguimento(); 
         }
         
-        function cancelarRota() { if (controleRota) { map.removeControl(controleRota); controleRota = null; } document.getElementById('btnCancelar').style.display = 'none'; }
+        function cancelarRota() { 
+            if (controleRota) { map.removeControl(controleRota); controleRota = null; } 
+            document.getElementById('btnCancelar').style.display = 'none'; 
+            lastRouteUpdatePos = null;
+        }
+        
         window.onload = function () { iniciarRastreamento(); setTimeout(() => { if (!userLat) exibirAlerta("Permissão", "Ative o GPS."); }, 3000); };
     </script>
 </body>
