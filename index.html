@@ -6,18 +6,23 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>GPS Bombeiros - Regional Leste</title>
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+
+    <!-- ícone do navegador -->
+    <link rel="icon" href="logo.png" sizes="any">
+    <link rel="icon" href="logo.png-32x32.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta name="theme-color" content="#D32F2F">
 
     <style>
         /* Cores de Status */
         .marker-ok { background: #D32F2F !important; border-color: #fff !important; }
         .marker-atencao { background: #F57C00 !important; border-color: #fff !important; }
         .marker-defeito { background: #424242 !important; border-color: #fff !important; }
-        .marker-unidade { background: #1976D2 !important; border-color: #fff !important; } /* Cor Azul para a Base */
+        .marker-unidade { background: #1976D2 !important; border-color: #fff !important; }
         
         /* Badge dentro do Popup */
         .status-badge {
