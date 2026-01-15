@@ -17,6 +17,7 @@
         .marker-ok { background: #D32F2F !important; border-color: #fff !important; }
         .marker-atencao { background: #F57C00 !important; border-color: #fff !important; }
         .marker-defeito { background: #424242 !important; border-color: #fff !important; }
+        .marker-unidade { background: #1976D2 !important; border-color: #fff !important; } /* Cor Azul para a Base */
         
         /* Badge dentro do Popup */
         .status-badge {
@@ -31,6 +32,9 @@
         .data-verificacao {
             font-size: 11px; color: #888; margin-bottom: 10px; font-style: italic;
         }
+        
+        /* Ocultar elementos auxiliares */
+        .hidden { display: none; }
     </style>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -47,9 +51,9 @@
         <h1>🚒 Hidrantes - Unidade 10</h1>
     </div>
 
-    <div id="customAlert" class="modal-overlay">
-        <div class="modal-box" style="text-align: center;">
-            <div class="modal-title" id="alertTitle">Atenção</div>
+    <div id="customAlert" class="modal-overlay" style="display:none; align-items:center; justify-content:center;">
+        <div class="modal-box" style="text-align: center; background:white; padding:20px; border-radius:10px;">
+            <div class="modal-title" id="alertTitle" style="font-weight:bold; margin-bottom:10px;">Atenção</div>
             <div style="color:#666; margin-bottom:20px;" id="alertMsg">Mensagem aqui</div>
             <button class="btn-modal btn-confirm" onclick="fecharAlerta()">Entendi</button>
         </div>
@@ -93,7 +97,7 @@
     </div>
 
     <div class="controles-flutuantes">
-        <button id="btnCancelar" class="btn-fab cancelar" onclick="cancelarRota()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+        <button id="btnCancelar" class="btn-fab cancelar" style="display:none;" onclick="cancelarRota()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
         <button id="btnGps" class="btn-fab gps" onclick="ativarSeguimento()"><svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg></button>
     </div>
 
@@ -110,6 +114,7 @@
 
         // --- AVALIAÇÃO ---
         let hidranteAtual = "";
+        
         function abrirAvaliacao(nome) {
             hidranteAtual = nome;
             document.getElementById('tituloAvaliacao').innerText = "Avaliar: " + nome;
@@ -119,7 +124,9 @@
             document.getElementById('avalData').valueAsDate = new Date();
             document.getElementById('modalAvaliacao').style.display = 'flex';
         }
+
         function fecharAvaliacao() { document.getElementById('modalAvaliacao').style.display = 'none'; }
+        
         function togglePressao() {
             const radios = document.getElementsByName('funciona');
             let sel = "Sim";
@@ -131,6 +138,7 @@
         function salvarAvaliacao() {
             const btn = document.getElementById('btnSalvar');
             btn.innerText = "Enviando..."; btn.disabled = true;
+            
             const nome = document.getElementById('avalNome').value;
             const data = document.getElementById('avalData').value;
             const radios = document.getElementsByName('funciona');
@@ -146,10 +154,10 @@
             emailjs.send("service_12bdfek", "template_hwj670q", templateParams)
                 .then(function (response) {
                     fecharAvaliacao();
-                    exibirAlerta("Sucesso", "Avaliação enviada!");
+                    exibirAlerta("Sucesso", "Avaliação enviada com sucesso!");
                     btn.innerText = "Enviar Avaliação"; btn.disabled = false;
                 }, function (error) {
-                    exibirAlerta("Erro", "Falha ao enviar e-mail.");
+                    exibirAlerta("Erro", "Falha ao enviar. Verifique sua conexão.");
                     btn.innerText = "Enviar Avaliação"; btn.disabled = false;
                 });
         }
@@ -163,8 +171,6 @@
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
         var userLat, userLng, controleRota, userMarker, isFollowing = false;
-        
-        // Variável para controlar quando atualizar a rota (evita travamento)
         var lastRouteUpdatePos = null; 
 
         var locais = [
@@ -181,31 +187,35 @@
 
         locais.forEach(local => {
             let classeCor = ""; let textoStatus = ""; let badgeClass = "";
-            if (local.tipo === "unidade") { classeCor = "marker-unidade"; }
+            if (local.tipo === "unidade") { classeCor = "marker-unidade"; textoStatus = "Base"; }
             else {
                 if (local.status === 'ok') { classeCor = "marker-ok"; textoStatus = "Operacional"; badgeClass = "badge-ok"; }
                 else if (local.status === 'atencao') { classeCor = "marker-atencao"; textoStatus = "Baixa Pressão"; badgeClass = "badge-atencao"; }
                 else if (local.status === 'defeito') { classeCor = "marker-defeito"; textoStatus = "Inoperante"; badgeClass = "badge-defeito"; }
                 else { classeCor = "marker-hidrante"; textoStatus = "Sem dados"; }
             }
+            
             const customIcon = L.divIcon({ className: 'custom-div-icon', html: `<div class="custom-marker-pin ${classeCor}">${local.tipo==="unidade"?svgUnidade:svgHidrante}</div>`, iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -45] });
             const marker = L.marker([local.lat, local.lng], { icon: customIcon }).addTo(map);
 
             marker.bindPopup(() => {
-                let distTexto = "Calculando...";
-                if (userLat) distTexto = map.distance([userLat, userLng], [local.lat, local.lng]) > 1000 ? (map.distance([userLat, userLng], [local.lat, local.lng])/1000).toFixed(1) + " km" : Math.round(map.distance([userLat, userLng], [local.lat, local.lng])) + " m";
+                let distTexto = "---";
+                if (userLat) {
+                   const metros = map.distance([userLat, userLng], [local.lat, local.lng]);
+                   distTexto = metros > 1000 ? (metros/1000).toFixed(1) + " km" : Math.round(metros) + " m";
+                }
                 
                 let btnAvaliar = local.tipo !== 'unidade' ? `<button class="btn-rota btn-avaliar" onclick="abrirAvaliacao('${local.nome}')"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> AVALIAR HIDRANTE</button>` : '';
                 let statusHtml = local.tipo !== 'unidade' ? `<div class="status-badge ${badgeClass}">${textoStatus}</div><div class="data-verificacao">Última avaliação: ${local.ultima_verificacao || '--/--/----'}</div>` : '';
 
-                return `<div class="card-popup"><div class="card-header"><img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/280x150?text=Sem+Imagem'"></div><div class="card-body"><div class="card-title">${local.nome}</div><div class="card-ref">${local.ref}</div>${statusHtml}<div class="card-eta"><svg style="width:16px;height:16px;fill:var(--primary-blue)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Distância: ${distTexto}</div><div class="area-botoes"><button class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng})"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg> TRAÇAR ROTA</button><button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})"><img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg"> ABRIR NO MAPS</button>${btnAvaliar}</div></div></div>`;
+                // ATENÇÃO: Adicionado 'btnRoute-' para identificar o botão e alterar o texto durante carregamento
+                return `<div class="card-popup"><div class="card-header"><img src="${local.imagem}" class="card-img" onclick="abrirModal('${local.imagem}')" onerror="this.src='https://via.placeholder.com/280x150?text=Sem+Imagem'"></div><div class="card-body"><div class="card-title">${local.nome}</div><div class="card-ref">${local.ref}</div>${statusHtml}<div class="card-eta"><svg style="width:16px;height:16px;fill:var(--primary-blue)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Distância: ${distTexto}</div><div class="area-botoes"><button id="btnRoute" class="btn-rota btn-interno" onclick="tracarRota(${local.lat}, ${local.lng}, this)"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg> TRAÇAR ROTA</button><button class="btn-rota btn-google" onclick="abrirGoogleMaps(${local.lat}, ${local.lng})"><img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg"> ABRIR NO MAPS</button>${btnAvaliar}</div></div></div>`;
             });
         });
 
-        // --- GPS & ROTA DINÂMICA (CORRIGIDO) ---
+        // --- GPS & ROTA ---
         function iniciarRastreamento() {
             if ("geolocation" in navigator) {
-                // Diminuí a frequência do GPS para economizar bateria e processamento
                 const options = { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 };
                 navigator.geolocation.watchPosition(atualizarPosicao, erroGps, options);
                 isFollowing = true; atualizarBotaoGps();
@@ -216,7 +226,6 @@
             userLat = position.coords.latitude;
             userLng = position.coords.longitude;
 
-            // 1. Cria ou Atualiza o Marcador da Pessoa
             if (!userMarker) {
                 const ui = L.divIcon({ className: 'custom-user-icon', html: `<div class="user-pulse"></div><div class="user-pin"></div>`, iconSize: [20, 20], iconAnchor: [10, 10] });
                 userMarker = L.marker([userLat, userLng], { icon: ui, zIndexOffset: 1000 }).addTo(map);
@@ -224,68 +233,82 @@
                 userMarker.setLatLng([userLat, userLng]);
             }
 
-            // 2. Centraliza a câmera se estiver no modo "Seguindo"
             if (isFollowing) {
                 map.flyTo([userLat, userLng], map.getZoom() < 16 ? 16 : map.getZoom(), { animate: true, duration: 0.8 });
             }
 
-            // 3. ATUALIZAÇÃO INTELIGENTE DA ROTA (FIX)
             if (controleRota) {
-                // Só recalcula se não tiver atualização anterior OU se andou mais de 40 metros
-                // Isso evita o erro 500 (Server Error) por excesso de pedidos
+                // Atualização Otimizada (apenas se mover > 40m)
                 if (!lastRouteUpdatePos || map.distance([userLat, userLng], lastRouteUpdatePos) > 40) {
-                    
                     var waypoints = controleRota.getWaypoints();
-                    var destino = waypoints[waypoints.length - 1].latLng;
-
-                    // Atualiza o ponto de partida para onde você está agora
-                    controleRota.setWaypoints([
-                        L.latLng(userLat, userLng),
-                        destino
-                    ]);
-                    
-                    // Salva a posição desta atualização
-                    lastRouteUpdatePos = [userLat, userLng];
-                    console.log("Rota recalculada (usuário moveu > 40m)");
+                    if(waypoints.length > 1) {
+                        var destino = waypoints[waypoints.length - 1].latLng;
+                        controleRota.setWaypoints([L.latLng(userLat, userLng), destino]);
+                        lastRouteUpdatePos = [userLat, userLng];
+                    }
                 }
             }
         }
 
         function erroGps(e) { console.warn(e.message); }
-        function ativarSeguimento() { if (!userLat) { iniciarRastreamento(); exibirAlerta("GPS", "Ative o GPS."); } else { isFollowing = true; map.flyTo([userLat, userLng], 16); atualizarBotaoGps(); } }
+        function ativarSeguimento() { if (!userLat) { iniciarRastreamento(); exibirAlerta("GPS", "Aguardando sinal de GPS..."); } else { isFollowing = true; map.flyTo([userLat, userLng], 16); atualizarBotaoGps(); } }
+        
         function atualizarBotaoGps() {
             const b = document.getElementById('btnGps');
             if (isFollowing) { b.classList.add('seguindo'); b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>'; }
             else { b.classList.remove('seguindo'); b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>'; }
         }
+        
         map.on('dragstart', () => { isFollowing = false; atualizarBotaoGps(); });
         function abrirModal(s) { const m = document.getElementById('modalImagem'); document.getElementById('imgExpandida').src = s; m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
         function fecharModal() { const m = document.getElementById('modalImagem'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
-        function abrirGoogleMaps(lat, lng) { window.location.href = `https://www.google.com/maps/dir/?api=1&destination=$${lat},${lng}&travelmode=driving`; }
         
-        function tracarRota(dLa, dLn) { 
+        // CORREÇÃO CRÍTICA: Link Universal do Google Maps
+        function abrirGoogleMaps(lat, lng) { 
+            // Usa a API universal que funciona melhor em mobile
+            window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`; 
+        }
+        
+        // MELHORIA: Feedback visual e tratamento de erro na rota
+        function tracarRota(dLa, dLn, btnElement) { 
             if (!userLat) { ativarSeguimento(); return; } 
             
+            // Salva texto original e mostra "Carregando"
+            let textoOriginal = "";
+            if(btnElement) {
+                textoOriginal = btnElement.innerHTML;
+                btnElement.innerHTML = "Calculando...";
+                btnElement.disabled = true;
+            }
+
             if (controleRota) map.removeControl(controleRota); 
             
-            // Configuração OTIMIZADA para evitar erros e travamentos
             controleRota = L.Routing.control({ 
                 waypoints: [L.latLng(userLat, userLng), L.latLng(dLa, dLn)], 
                 lineOptions: { styles: [{ color: 'white', opacity: 0.9, weight: 9 }, { color: '#1a73e8', opacity: 1, weight: 5 }] }, 
                 createMarker: () => null, 
                 addWaypoints: false, 
                 draggableWaypoints: false,
-                routeWhileDragging: false, // Desativa cálculo ao arrastar (pesado)
-                show: false, // Esconde painel de texto
-                fitSelectedRoutes: false // Não fica dando zoom automático chato
-            }).addTo(map); 
-            
-            // Salva posição inicial para controle de recálculo
-            lastRouteUpdatePos = [userLat, userLng];
+                routeWhileDragging: false, 
+                show: false, 
+                fitSelectedRoutes: false 
+            }).addTo(map);
 
-            document.getElementById('btnCancelar').style.display = 'flex'; 
-            map.closePopup(); 
-            ativarSeguimento(); 
+            // Se der erro no servidor de rotas (comum no OSRM gratuito)
+            controleRota.on('routingerror', function(e) {
+                exibirAlerta("Rota Indisponível", "O servidor de rotas interno está congestionado. Use o botão 'Abrir no Maps'.");
+                if(btnElement) { btnElement.innerHTML = textoOriginal; btnElement.disabled = false; }
+            });
+
+            // Quando a rota é encontrada
+            controleRota.on('routesfound', function(e) {
+                 if(btnElement) { btnElement.innerHTML = textoOriginal; btnElement.disabled = false; }
+                 map.closePopup(); 
+                 document.getElementById('btnCancelar').style.display = 'flex'; 
+                 ativarSeguimento(); 
+            });
+            
+            lastRouteUpdatePos = [userLat, userLng];
         }
         
         function cancelarRota() { 
@@ -294,8 +317,7 @@
             lastRouteUpdatePos = null;
         }
         
-        window.onload = function () { iniciarRastreamento(); setTimeout(() => { if (!userLat) exibirAlerta("Permissão", "Ative o GPS."); }, 3000); };
+        window.onload = function () { iniciarRastreamento(); setTimeout(() => { if (!userLat) exibirAlerta("Permissão", "Para funcionar corretamente, ative o GPS."); }, 3000); };
     </script>
 </body>
-
 </html>
